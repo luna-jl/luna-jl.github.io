@@ -1,0 +1,33 @@
+name: Deploy chart-libraries-comparison
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/chart-libraries-comparison-src/**'
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install & build
+        working-directory: apps/chart-libraries-comparison-src
+        run: |
+          npm install
+          npm run build
+
+      - name: Copy output to apps/chart-libraries-comparison
+        run: |
+          rm -rf apps/chart-libraries-comparison
+          cp -r apps/chart-libraries-comparison-src/dist apps/chart-libraries-comparison
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "deploy: chart-libraries-comparison"
+          file_pattern: apps/chart-libraries-comparison/**
